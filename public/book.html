@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ thống Quản lý Thư viện - LibZone</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Tùy chỉnh nhẹ để đảm bảo layout */
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900 h-screen flex overflow-hidden">
+
+    <div class="w-64 bg-indigo-950 text-white flex flex-col h-screen sticky top-0">
+        <div class="p-6 text-2xl font-bold border-b border-indigo-800 flex items-center">
+            <i class="fas fa-book-reader mr-3 text-yellow-400"></i> LibZone
+        </div>
+        <nav class="flex-grow p-4 space-y-1.5 overflow-y-auto">
+            <a onclick="showPage('dashboardPage', this)"
+   class="menu-item flex items-center gap-3 py-3 px-4 rounded-lg hover:bg-indigo-800 cursor-pointer">
+    <i class="fas fa-book w-5 text-center"></i> Trang chủ
+</a>
+            <a href="books.html"
+   class="flex items-center gap-3 py-3 px-4 rounded-lg hover:bg-indigo-800">
+    <i class="fas fa-book w-5 text-center"></i> Quản lý Sách
+</a>
+            <a onclick="showPage('memberPage', this)"
+   class="menu-item flex items-center gap-3 py-3 px-4 rounded-lg hover:bg-indigo-800 cursor-pointer">
+    <i class="fas fa-users w-5 text-center"></i> Quản lý Độc giả
+</a>
+            <a onclick="showPage('borrowPage', this)"
+   class="menu-item flex items-center gap-3 py-3 px-4 rounded-lg hover:bg-indigo-800 cursor-pointer">
+    <i class="fas fa-exchange-alt w-5 text-center"></i> Mượn / Trả sách
+            </a>
+            <div class="pt-4 border-t border-indigo-800"></div>
+            <a href="#" class="flex items-center gap-3 py-3 px-4 rounded-lg hover:bg-indigo-800 transition text-gray-300 hover:text-white">
+                <i class="fas fa-file-contract w-5 text-center"></i> Báo cáo
+            </a>
+            <a href="#" class="flex items-center gap-3 py-3 px-4 rounded-lg hover:bg-indigo-800 transition text-gray-300 hover:text-white">
+                <i class="fas fa-cog w-5 text-center"></i> Cài đặt
+            </a>
+        </nav>
+        <div class="p-4 border-t border-indigo-800 text-sm text-indigo-300 flex justify-between">
+            <span>Phiên bản 1.0</span>
+            <i class="fas fa-sign-out-alt cursor-pointer hover:text-white"></i>
+        </div>
+    </div>
+
+<!-- CONTENT -->
+<div class="flex-1 p-8">
+
+    <h1 class="text-3xl font-bold mb-6">Quản lý Sách</h1>
+
+    <button onclick="openModal()" 
+        class="bg-indigo-600 text-white px-4 py-2 rounded mb-4">
+        Thêm sách
+    </button>
+
+    <input id="searchInput" placeholder="Tìm sách..."
+        class="border p-2 w-full mb-4 rounded"
+        onkeyup="searchBook()">
+
+    <table class="w-full bg-white shadow rounded">
+        <thead class="bg-gray-100">
+            <tr>
+                <th class="p-3">Mã</th>
+                <th class="p-3">Tên</th>
+                <th class="p-3">Tác giả</th>
+                <th class="p-3">Thể loại</th>
+                <th class="p-3">Trạng thái</th>
+                <th class="p-3">Hành động</th>
+            </tr>
+        </thead>
+        <tbody id="bookTable"></tbody>
+    </table>
+
+</div>
+
+<script>
+let books = [
+    {id:1, name:"Đắc Nhân Tâm", author:"Dale Carnegie", category:"Kỹ năng", status:"Còn"}
+];
+
+function renderBooks(list = books) {
+    let html = "";
+    list.forEach(b => {
+        html += `
+        <tr>
+            <td class="p-3">${b.id}</td>
+            <td class="p-3">${b.name}</td>
+            <td class="p-3">${b.author}</td>
+            <td class="p-3">${b.category}</td>
+            <td class="p-3">${b.status}</td>
+            <td class="p-3">
+                <button onclick="deleteBook(${b.id})">Xoá</button>
+            </td>
+        </tr>`;
+    });
+    document.getElementById("bookTable").innerHTML = html;
+}
+
+function deleteBook(id){
+    books = books.filter(b => b.id !== id);
+    renderBooks();
+}
+
+function searchBook(){
+    let k = document.getElementById("searchInput").value.toLowerCase();
+    renderBooks(books.filter(b => b.name.toLowerCase().includes(k)));
+}
+
+renderBooks();
+</script>
+
+</body>
+</html>
