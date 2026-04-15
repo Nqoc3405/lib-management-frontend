@@ -10,7 +10,7 @@
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-900 h-screen flex overflow-hidden">
+<body class="bg-gray-50 text-gray-900 h-screen flex ">
 
     <div class="w-64 bg-indigo-950 text-white flex flex-col h-screen sticky top-0">
         <div class="p-6 text-2xl font-bold border-b border-indigo-800 flex items-center">
@@ -68,7 +68,7 @@
         class="border p-2 pl-10 w-full rounded"
         oninput="searchBook()">
 </div>
-    <div class="max-h-[500px] overflow-y-auto border rounded-lg">
+    <div class="flex flex-col">
 
 <table class="w-full bg-white shadow rounded">
     <thead class="bg-gray-100 sticky top-0">
@@ -235,7 +235,7 @@ function saveBook() {
 }
 // ===== PHÂN TRANG =====
 let currentPage = 1;
-let itemsPerPage = 10;
+let itemsPerPage = 8;
 
 // ===== HIỂN THỊ SÁCH =====
 function renderBooks(list = books) {
