@@ -10,18 +10,18 @@
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-900 h-screen flex overflow-hidden">
+<body class="bg-gray-50 text-gray-900 h-screen flex ">
 
     <div class="w-64 bg-indigo-950 text-white flex flex-col h-screen sticky top-0">
         <div class="p-6 text-2xl font-bold border-b border-indigo-800 flex items-center">
             <i class="fas fa-book-reader mr-3 text-yellow-400"></i> LibZone
         </div>
         <nav class="flex-grow p-4 space-y-1.5 overflow-y-auto">
-            <a onclick="showPage('dashboardPage', this)"
+            <a href="giaodien.html"
    class="menu-item flex items-center gap-3 py-3 px-4 rounded-lg hover:bg-indigo-800 cursor-pointer">
     <i class="fas fa-book w-5 text-center"></i> Trang chủ
 </a>
-            <a href="books.html"
+            <a href="book.html"
    class="flex items-center gap-3 py-3 px-4 rounded-lg hover:bg-indigo-800">
     <i class="fas fa-book w-5 text-center"></i> Quản lý Sách
 </a>
@@ -46,70 +46,303 @@
             <i class="fas fa-sign-out-alt cursor-pointer hover:text-white"></i>
         </div>
     </div>
+    <body class="bg-gray-50 text-gray-900 h-screen flex overflow-hidden">
 
 <div class="flex-1 p-8">
 
-    <h1 class="text-3xl font-bold mb-6">Quản lý Sách</h1>
-
+    <h1 class="text-3xl font-semibold">Quản lý sách</h1>
+        <p class="text-gray-500 mt-1">
+            Danh sách tất cả các đầu sách trong thư viện
+        </p>
+    <div class="flex justify-end">
     <button onclick="openModal()" 
-        class="bg-indigo-600 text-white px-4 py-2 rounded mb-4">
-        Thêm sách
+        class="bg-indigo-600 text-white px-6 py-2 rounded-md mb-7">
+        + Thêm sách
     </button>
+    </div>
+<div class="relative mb-4">
+    <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+    <input 
+        id="searchInput" 
+        placeholder="Tìm sách tên sách, tác giả, thể loại..."
+        class="border p-2 pl-10 w-full rounded"
+        oninput="searchBook()">
+</div>
+    <div class="flex flex-col">
 
-    <input id="searchInput" placeholder="Tìm sách..."
-        class="border p-2 w-full mb-4 rounded"
-        onkeyup="searchBook()">
+<table class="w-full bg-white shadow rounded">
+    <thead class="bg-gray-100 sticky top-0">
+        <tr>
+            <th class="p-3 text-center">Mã</th>
+            <th class="p-3 text-center">Tên</th>
+            <th class="p-3 text-center">Tác giả</th>
+            <th class="p-3 text-center">Thể loại</th>
+            <th class="p-3 text-center">Trạng thái</th>
+            <th class="p-3 text-center">Số lượng</th>
+            <th class="p-3 text-center">Thao tác</th>
+        </tr>
+    </thead>
 
-    <table class="w-full bg-white shadow rounded">
-        <thead class="bg-gray-100">
-            <tr>
-                <th class="p-3">Mã</th>
-                <th class="p-3">Tên</th>
-                <th class="p-3">Tác giả</th>
-                <th class="p-3">Thể loại</th>
-                <th class="p-3">Trạng thái</th>
-                <th class="p-3">Hành động</th>
-            </tr>
-        </thead>
-        <tbody id="bookTable"></tbody>
-    </table>
+    <tbody id="bookTable"></tbody>
 
+</table>
+
+</div>
+    <div class="flex justify-end items-center gap-3 mt-6 fixed bottom-4 right-8 bg-white p-3 rounded shadow">
+                 <span id="bookInfo" class=" flex justify-end text-gray-500"></span>
+                      <di class="flex gap-2">
+                            <button onclick="prevPage()" class="px-3 py-1 border rounded">Trước</button>
+                      
+                      <div id="pageNumbers" class="flex gap-2"></div>
+                            <button onclick="nextPage()" class="px-3 py-1 border rounded">Sau</button>
+                      </div>
+    </div>
+        </div>
+
+</div>
+<div id="bookModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center">
+    <div class="bg-white p-8 rounded-2xl max-w-2xl w-full shadow-xl">
+        <h2 id="modalTitle" class="text-xl font-bold mb-4"><b>Thêm sách</b></h2>
+
+        <div class="form-group">
+                <label for="name"><b>Tên sách</b></label>
+                <input type="text" id="name" class="border p-2 w-full mb-2 rounded" placeholder="Nhập tên sách">
+            </div>
+        <div class="form-row">
+                <div class="form-group">
+                    <label for="author"><b>Tác giả</b></label>
+                    <input type="text" id="author" class="border p-2 w-full mb-2 rounded" placeholder="Nhập tên tác giả">
+                </div>
+        <div class="form-group">
+                    <label for="category"><b>Thể loại</b></label>
+                    <select id="category" class="border p-2 w-full mb-2 rounded">
+                        <option value="Kỹ năng sống">Kỹ năng sống</option>
+                        <option value="Văn học">Văn học</option>
+                        <option value="Khoa học">Khoa học</option>
+                        <option value="Kinh tế">Kinh tế</option>
+                    </select>
+                </div>
+        <div class="form-group">
+                    <label for="quantity"><b>Số lượng</b></label>
+                    <input type="number" id="quantity" class="border p-2 w-full mb-2 rounded" value="0" min="0">
+                </div> 
+        <div class="form-group">
+                <label class="block mb-2 font-medium">Mô tả</label>
+               <textarea id="description"class="w-full border rounded-xl p-3 h-28 mb-6" 
+               placeholder="Nhập mô tả về sách"></textarea>
+            </div>
+
+        <div class="form-group">
+            <label for="status"><b>Trạng thái</b></label>
+            <select id="status" class="border p-2 w-full mb-2 rounded">
+                <option value="Còn">Còn</option>
+                <option value="Hết">Hết</option>
+            </select>
+        </div>
+
+        <div class="flex justify-end gap-2">
+            <button onclick="closeModal()" class="flex-1 bg-gray-200 hover:bg-gray-300 text-dark py-3 rounded-md mb-7">
+             <b>Hủy</b></button>
+            <button onclick="saveBook()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-md mb-7">
+             <b>Thêm sách</b></button>
+        </div>
+    </div>
 </div>
 
 <script>
+
 let books = [
-    {id:1, name:"Đắc Nhân Tâm", author:"Dale Carnegie", category:"Kỹ năng", status:"Còn"}
+    {id:1, name:"Đắc Nhân Tâm", author:"Dale Carnegie", category:"Kỹ năng sống", quantity:5, status:"Còn"}
 ];
+
+let editId = null;
 
 function renderBooks(list = books) {
     let html = "";
     list.forEach(b => {
         html += `
         <tr>
-            <td class="p-3">${b.id}</td>
-            <td class="p-3">${b.name}</td>
-            <td class="p-3">${b.author}</td>
-            <td class="p-3">${b.category}</td>
-            <td class="p-3">${b.status}</td>
-            <td class="p-3">
-                <button onclick="deleteBook(${b.id})">Xoá</button>
+            <td class="p-3 text-center">${b.id}</td>
+            <td class="p-3 text-center">${b.name}</td>
+            <td class="p-3 text-center">${b.author}</td>
+            <td class="p-3 text-center">${b.category}</td>
+            <td class="p-3 text-center">${b.status}</td>
+            <td class="p-3 text-center">${b.quantity || 0}</td>
+            <td class="p-3 text-center">
+        <div class="flex justify-center gap-4 text-lg">
+        <button onclick="editBook(${b.id})" class="text-gray-600 hover:text-blue-600">
+          <i class="fas fa-pen"></i>
+        </button>
+
+        <button onclick="deleteBook(${b.id})" class="text-red-600 hover:text-red-600">
+          <i class="fas fa-trash"></i>
+        </button>
+        </div>
             </td>
         </tr>`;
     });
     document.getElementById("bookTable").innerHTML = html;
 }
 
-function deleteBook(id){
-    books = books.filter(b => b.id !== id);
+// ===== MODAL =====
+function openModal() {
+    editId = null;
+    document.getElementById("modalTitle").innerText = "Thêm sách";
+    document.getElementById("bookModal").classList.remove("hidden");
+    document.getElementById("bookModal").classList.add("flex");
+}
+
+function closeModal() {
+    document.getElementById("bookModal").classList.add("hidden");
+}
+
+// ===== SAVE =====
+function saveBook() {
+    let name = document.getElementById("name").value.trim();
+    let author = document.getElementById("author").value.trim();
+    let category = document.getElementById("category").value.trim();
+    let status = document.getElementById("status").value;
+    let quantity = parseInt(document.getElementById("quantity").value) || 0;
+
+    if (!name || !author || !category || !status || isNaN(quantity)) {
+        alert("Nhập đầy đủ thông tin!");
+        return;
+    }
+
+    if (editId) {
+        let b = books.find(x => x.id === editId);
+        b.name = name;
+        b.author = author;
+        b.category = category;
+        b.status = status;
+        b.quantity = quantity;
+    } else {
+        books.push({
+            id: books.length ? books[books.length - 1].id + 1 : 1,
+            name, author, category, status, quantity
+        });
+    }
+
+    localStorage.setItem("books", JSON.stringify(books));
+
+    document.getElementById("name").value = "";
+    document.getElementById("author").value = "";
+    document.getElementById("category").value = "";
+    document.getElementById("status").value = "";
+    document.getElementById("quantity").value = "";
+    renderBooks();
+    closeModal();
+}
+// ===== PHÂN TRANG =====
+let currentPage = 1;
+let itemsPerPage = 8;
+
+// ===== HIỂN THỊ SÁCH =====
+function renderBooks(list = books) {
+
+    let start = (currentPage - 1) * itemsPerPage;
+    let end = start + itemsPerPage;
+
+    let paginatedBooks = list.slice(start, end);
+
+    let html = "";
+
+    paginatedBooks.forEach(b => {
+        html += `
+        <tr>
+            <td class="p-3 text-center">${b.id}</td>
+            <td class="p-3 text-center">${b.name}</td>
+            <td class="p-3 text-center">${b.author}</td>
+            <td class="p-3 text-center">${b.category}</td>
+            <td class="p-3 text-center">${b.status}</td>
+            <td class="p-3 text-center">${b.quantity}</td>
+            <td class="p-3 text-center">
+                <i onclick="editBook(${b.id})" class="fas fa-pen cursor-pointer mr-3 text-blue-600"></i>
+                <i onclick="deleteBook(${b.id})" class="fas fa-trash cursor-pointer text-red-600"></i>
+            </td>
+        </tr>`;
+    });
+
+    document.getElementById("bookTable").innerHTML = html;
+
+    renderPagination(list);
+}
+
+// ===== HIỂN THỊ SỐ TRANG =====
+function renderPagination(list) {
+
+    let totalPages = Math.ceil(list.length / itemsPerPage);
+
+    document.getElementById("bookInfo").innerText =
+        `Hiển thị ${list.length} trong tổng số ${books.length} đầu sách`;
+
+    let html = "";
+
+    for (let i = 1; i <= totalPages; i++) {
+        html += `
+        <button onclick="goToPage(${i})"
+        class="px-3 py-1 border rounded ${i === currentPage ? 'bg-blue-600 text-white' : ''}">
+        ${i}
+        </button>`;
+    }
+
+    document.getElementById("pageNumbers").innerHTML = html;
+}
+
+// ===== CHUYỂN TRANG =====
+function goToPage(page) {
+    currentPage = page;
     renderBooks();
 }
 
+function nextPage() {
+    let totalPages = Math.ceil(books.length / itemsPerPage);
+
+    if (currentPage < totalPages) {
+        currentPage++;
+        renderBooks();
+    }
+}
+
+function prevPage() {
+    if (currentPage > 1) {
+        currentPage--;
+        renderBooks();
+    }
+}
+
+// ===== EDIT =====
+function editBook(id){
+    let b = books.find(x => x.id === id);
+    if (!b) return;
+
+    editId = id;
+
+    document.getElementById("modalTitle").innerText = "Sửa sách";
+    document.getElementById("name").value = b.name;
+    document.getElementById("author").value = b.author;
+    document.getElementById("category").value = b.category;
+    document.getElementById("quantity").value = b.quantity;
+
+    openModal();
+}
+
+// ===== DELETE =====
+function deleteBook(id){
+    books = books.filter(b => b.id !== id);
+    localStorage.setItem("books", JSON.stringify(books));
+    renderBooks();
+}
+
+// ===== SEARCH =====
 function searchBook(){
     let k = document.getElementById("searchInput").value.toLowerCase();
     renderBooks(books.filter(b => b.name.toLowerCase().includes(k)));
 }
 
+// INIT
 renderBooks();
+
 </script>
 
 </body>
