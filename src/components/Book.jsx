@@ -48,14 +48,41 @@ function Book() {
 
     return saved
       ? JSON.parse(saved)
-      : [];
+      : [
+          {
+            id: 1,
+            name: "Đắc Nhân Tâm",
+            author: "Dale Carnegie",
+            category: "Kỹ năng sống",
+            quantity: 5,
+            status: "Còn",
+          },
+          {
+            id: 2,
+            name: "Nhà Giả Kim",
+            author: "Paulo Coelho",
+            category: "Văn học",
+            quantity: 0,
+            status: "Hết",
+          },
+        ];
   });
 
   const [search, setSearch] = useState("");
+  const [categoryFilter, setCategoryFilter] =
+    useState("Tất cả");
+
+  const [statusFilter, setStatusFilter] =
+    useState("Tất cả");
+
   const [showModal, setShowModal] = useState(false);
+
   const [editId, setEditId] = useState(null);
+
   const [deleteId, setDeleteId] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
+
+  const [currentPage, setCurrentPage] =
+    useState(1);
 
   const booksPerPage = 5;
 
@@ -68,8 +95,15 @@ function Book() {
   });
 
   useEffect(() => {
-    localStorage.setItem("books", JSON.stringify(books));
+    localStorage.setItem(
+      "books",
+      JSON.stringify(books)
+    );
   }, [books]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search, categoryFilter, statusFilter]);
 
   const saveBook = () => {
     if (!form.name || !form.author) {
@@ -77,18 +111,29 @@ function Book() {
       return;
     }
 
-    if (editId) {
+    const newBook = {
+      ...form,
+      quantity: Number(form.quantity),
+      status:
+        Number(form.quantity) > 0
+          ? "Còn"
+          : "Hết",
+    };
+
+    if (editId !== null) {
       setBooks(
         books.map((b) =>
-          b.id === editId ? { ...b, ...form } : b
+          b.id === editId
+            ? { ...b, ...newBook }
+            : b
         )
       );
     } else {
       setBooks([
         ...books,
         {
-          id: books.length + 1,
-          ...form,
+          id: Date.now(),
+          ...newBook,
         },
       ]);
     }
@@ -97,11 +142,9 @@ function Book() {
   };
 
   const deleteBook = () => {
-    const updatedBooks = books.filter(
-      (b) => b.id !== deleteId
+    setBooks(
+      books.filter((b) => b.id !== deleteId)
     );
-
-    setBooks(updatedBooks);
 
     setDeleteId(null);
   };
@@ -114,6 +157,7 @@ function Book() {
 
   const closeModal = () => {
     setShowModal(false);
+
     setEditId(null);
 
     setForm({
@@ -125,15 +169,35 @@ function Book() {
     });
   };
 
-  const filteredBooks = books.filter((b) =>
-    b.name.toLowerCase().includes(search.toLowerCase())
+  const filteredBooks = books.filter((b) => {
+    const matchSearch = b.name
+      .toLowerCase()
+      .includes(search.toLowerCase());
+
+    const matchCategory =
+      categoryFilter === "Tất cả" ||
+      b.category === categoryFilter;
+
+    const matchStatus =
+      statusFilter === "Tất cả" ||
+      b.status === statusFilter;
+
+    return (
+      matchSearch &&
+      matchCategory &&
+      matchStatus
+    );
+  });
+
+  const totalPages = Math.max(
+    1,
+    Math.ceil(
+      filteredBooks.length / booksPerPage
+    )
   );
 
-  const totalPages = Math.ceil(
-    filteredBooks.length / booksPerPage
-  );
-
-  const startIndex = (currentPage - 1) * booksPerPage;
+  const startIndex =
+    (currentPage - 1) * booksPerPage;
 
   const currentBooks = filteredBooks.slice(
     startIndex,
@@ -141,225 +205,240 @@ function Book() {
   );
 
   return (
- <Box
-       sx={{
-         display: "flex",
-         minHeight: "100vh",
-         bgcolor: "#f5f5f5",
-       }}
-     >
-       {/* SIDEBAR */}
-       <Drawer
-         variant="permanent"
-         sx={{
-           width: 280,
-           flexShrink: 0,
-           "& .MuiDrawer-paper": {
-             width: 280,
-             bgcolor: "#171654",
-             color: "white",
-             p: 2,
-             boxSizing: "border-box",
-           },
-         }}
-       >
-         <Box>
-           {/* LOGO */}
-           <Box
-             sx={{
-               display: "flex",
-               alignItems: "center",
-               gap: 1.5,
-               mb: 4,
-             }}
-           >
-             <MdMenuBook
-               size={46}
-               color="#facc15"
-             />
- 
-             <Typography
-               sx={{
-                 fontSize: 40,
-                 fontWeight: "bold",
-               }}
-             >
-               LibZone
-             </Typography>
-           </Box>
- 
-           {/* MENU */}
-           <List>
-             <ListItem disablePadding>
-               <ListItemButton
-                 component={Link}
-                 to="/home"
-                 sx={{
-                   borderRadius: 2,
-                   mb: 1,
-                 }}
-               >
-                 <ListItemIcon
+    <Box
                    sx={{
-                     color: "white",
-                     minWidth: 40,
+                     display: "flex",
+                     minHeight: "100vh",
+                     bgcolor: "#f5f5f5",
                    }}
                  >
-                   <FaBook />
-                 </ListItemIcon>
- 
-                 <ListItemText
-                   primary="Tổng quan"
-                   primaryTypographyProps={{
-                     fontWeight: "bold",
-                   }}
-                 />
-               </ListItemButton>
-             </ListItem>
- 
-             <ListItem disablePadding>
-               <ListItemButton
-                 component={Link}
-                 to="/book"
-                 sx={{
-                   borderRadius: 2,
-                   mb: 1,
-                 }}
-               >
-                 <ListItemIcon
-                   sx={{
-                     color: "white",
-                     minWidth: 40,
-                   }}
-                 >
-                   <FaBook />
-                 </ListItemIcon>
- 
-                 <ListItemText
-                   primary="Quản lý sách"
-                   primaryTypographyProps={{
-                     fontWeight: "bold",
-                   }}
-                 />
-               </ListItemButton>
-             </ListItem>
- 
-             <ListItem disablePadding>
-               <ListItemButton
-                 component={Link}
-                 to="/reader"
-                 sx={{
-                   borderRadius: 2,
-                   mb: 1,
-                 }}
-               >
-                 <ListItemIcon
-                   sx={{
-                     color: "white",
-                     minWidth: 40,
-                   }}
-                 >
-                   <FaUsers />
-                 </ListItemIcon>
- 
-                 <ListItemText
-                   primary="Quản lý độc giả"
-                   primaryTypographyProps={{
-                     fontWeight: "bold",
-                   }}
-                 />
-               </ListItemButton>
-             </ListItem>
- 
-             <ListItem disablePadding>
-               <ListItemButton
-                 component={Link}
-                 to="/borrow"
-               >
-                 <ListItemIcon
-                   sx={{
-                     color: "white",
-                     minWidth: 40,
-                   }}
-                 >
-                   <FaExchangeAlt />
-                 </ListItemIcon>
- 
-                 <ListItemText
-                   primary="Mượn / Trả sách"
-                   primaryTypographyProps={{
-                     fontWeight: "bold",
-                   }}
-                 />
-               </ListItemButton>
-             </ListItem>
-           </List>
-         </Box>
- 
-         {/* BOTTOM */}
-         <Box sx={{ mt: "auto" }}>
-           <Divider
-             sx={{
-               bgcolor:
-                 "rgba(255,255,255,0.2)",
-               mb: 2,
-             }}
-           />
- 
-           <List>
-             <ListItem disablePadding>
-               <ListItemButton component={Link} to="/settings">
-                 <ListItemIcon
-                   sx={{
-                     color: "white",
-                     minWidth: 40,
-                   }}
-                 >
-                   <FaCog />
-                 </ListItemIcon>
- 
-                 <ListItemText
-                   primary="Cài đặt"
-                   primaryTypographyProps={{
-                     fontWeight: "bold",
-                   }}
-                 />
-               </ListItemButton>
-             </ListItem>
-           </List>
-         </Box>
-       </Drawer>
- 
+                   {/* SIDEBAR */}
+                   <Drawer
+                     variant="permanent"
+                     sx={{
+                       width: 280,
+                       flexShrink: 0,
+                       "& .MuiDrawer-paper": {
+                         width: 280,
+                         bgcolor: "#171654",
+                         color: "white",
+                         p: 2,
+                         boxSizing: "border-box",
+                       },
+                     }}
+                   >
+                     <Box>
+                       {/* LOGO */}
+                       <Box
+                         sx={{
+                           display: "flex",
+                           alignItems: "center",
+                           gap: 1.5,
+                           mb: 4,
+                         }}
+                       >
+                         <MdMenuBook
+                           size={46}
+                           color="#facc15"
+                         />
+             
+                         <Typography
+                           sx={{
+                             fontSize: 40,
+                             fontWeight: "bold",
+                           }}
+                         >
+                           LibZone
+                         </Typography>
+                       </Box>
+             
+                       {/* MENU */}
+                       <List>
+                         <ListItem disablePadding>
+                           <ListItemButton
+                             component={Link}
+                             to="/home"
+                             sx={{
+                               borderRadius: 2,
+                               mb: 1,
+                             }}
+                           >
+                             <ListItemIcon
+                               sx={{
+                                 color: "white",
+                                 minWidth: 40,
+                               }}
+                             >
+                               <FaBook />
+                             </ListItemIcon>
+             
+                             <ListItemText
+                               primary="Tổng quan"
+                               primaryTypographyProps={{
+                                 fontWeight: "bold",
+                               }}
+                             />
+                           </ListItemButton>
+                         </ListItem>
+             
+                         <ListItem disablePadding>
+                           <ListItemButton
+                             component={Link}
+                             to="/book"
+                             sx={{
+                               borderRadius: 2,
+                               mb: 1,
+                             }}
+                           >
+                             <ListItemIcon
+                               sx={{
+                                 color: "white",
+                                 minWidth: 40,
+                               }}
+                             >
+                               <FaBook />
+                             </ListItemIcon>
+             
+                             <ListItemText
+                               primary="Quản lý sách"
+                               primaryTypographyProps={{
+                                 fontWeight: "bold",
+                               }}
+                             />
+                           </ListItemButton>
+                         </ListItem>
+             
+                         <ListItem disablePadding>
+                           <ListItemButton
+                             component={Link}
+                             to="/reader"
+                             sx={{
+                               borderRadius: 2,
+                               mb: 1,
+                             }}
+                           >
+                             <ListItemIcon
+                               sx={{
+                                 color: "white",
+                                 minWidth: 40,
+                               }}
+                             >
+                               <FaUsers />
+                             </ListItemIcon>
+             
+                             <ListItemText
+                               primary="Quản lý độc giả"
+                               primaryTypographyProps={{
+                                 fontWeight: "bold",
+                               }}
+                             />
+                           </ListItemButton>
+                         </ListItem>
+             
+                         <ListItem disablePadding>
+                           <ListItemButton
+                             component={Link}
+                             to="/borrow"
+                           >
+                             <ListItemIcon
+                               sx={{
+                                 color: "white",
+                                 minWidth: 40,
+                               }}
+                             >
+                               <FaExchangeAlt />
+                             </ListItemIcon>
+             
+                             <ListItemText
+                               primary="Mượn / Trả sách"
+                               primaryTypographyProps={{
+                                 fontWeight: "bold",
+                               }}
+                             />
+                           </ListItemButton>
+                         </ListItem>
+                       </List>
+                     </Box>
+             
+                     {/* BOTTOM */}
+                     <Box sx={{ mt: "auto" }}>
+                       <Divider
+                         sx={{
+                           bgcolor:
+                             "rgba(255,255,255,0.2)",
+                           mb: 2,
+                         }}
+                       />
+             
+                       <List>
+                         <ListItem disablePadding>
+                           <ListItemButton component={Link} to="/settings">
+                             <ListItemIcon
+                               sx={{
+                                 color: "white",
+                                 minWidth: 40,
+                               }}
+                             >
+                               <FaCog />
+                             </ListItemIcon>
+             
+                             <ListItemText
+                               primary="Cài đặt"
+                               primaryTypographyProps={{
+                                 fontWeight: "bold",
+                               }}
+                             />
+                           </ListItemButton>
+                         </ListItem>
+                       </List>
+                     </Box>
+                   </Drawer>
+
       {/* MAIN */}
       <Box
         sx={{
           flexGrow: 1,
           p: 4,
-          background: "#f5f6fa",
         }}
       >
-        <Typography variant="h3" fontWeight="bold">
+        <Typography
+          variant="h3"
+          fontWeight="bold"
+        >
           Quản lý sách
         </Typography>
 
-        <Typography sx={{ mt: 1, color: "gray" }}>
-          Danh sách tất cả các đầu sách trong thư viện
+        <Typography
+          sx={{
+            mt: 1,
+            color: "gray",
+          }}
+        >
+          Danh sách tất cả đầu sách
         </Typography>
 
-        {/* SEARCH + BUTTON */}
+        {/* SEARCH + FILTER */}
         <Box
           sx={{
             mt: 3,
             mb: 3,
             display: "flex",
             gap: 2,
+            flexWrap: "wrap",
           }}
         >
           <TextField
-            fullWidth
             placeholder="Tìm sách..."
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) =>
+              setSearch(e.target.value)
+            }
+            sx={{
+              flex: 1,
+              minWidth: 250,
+              bgcolor: "white",
+              borderRadius: 2,
+            }}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
@@ -369,9 +448,89 @@ function Book() {
             }}
           />
 
+          <Select
+            value={categoryFilter}
+            onChange={(e) =>
+              setCategoryFilter(
+                e.target.value
+              )
+            }
+            sx={{
+              minWidth: 180,
+              bgcolor: "white",
+            }}
+          >
+            <MenuItem value="Tất cả">
+              Tất cả thể loại
+            </MenuItem>
+
+            <MenuItem value="Kỹ năng sống">
+              Kỹ năng sống
+            </MenuItem>
+
+            <MenuItem value="Văn học">
+              Văn học
+            </MenuItem>
+
+            <MenuItem value="Khoa học">
+              Khoa học
+            </MenuItem>
+
+            <MenuItem value="Kinh tế">
+              Kinh tế
+            </MenuItem>
+          </Select>
+
+          <Select
+            value={statusFilter}
+            onChange={(e) =>
+              setStatusFilter(
+                e.target.value
+              )
+            }
+            sx={{
+              minWidth: 170,
+              bgcolor: "white",
+            }}
+          >
+            <MenuItem value="Tất cả">
+              Tất cả trạng thái
+            </MenuItem>
+
+            <MenuItem value="Còn">
+              Còn
+            </MenuItem>
+
+            <MenuItem value="Hết">
+              Hết
+            </MenuItem>
+          </Select>
+
+          <Button
+            variant="outlined"
+            onClick={() => {
+              setSearch("");
+              setCategoryFilter(
+                "Tất cả"
+              );
+              setStatusFilter(
+                "Tất cả"
+              );
+            }}
+          >
+            Reset
+          </Button>
+
           <Button
             variant="contained"
-            onClick={() => setShowModal(true)}
+            sx={{
+              px: 3,
+              fontWeight: "bold",
+              textTransform: "none",
+            }}
+            onClick={() =>
+              setShowModal(true)
+            }
           >
             Thêm sách
           </Button>
@@ -380,42 +539,147 @@ function Book() {
         {/* TABLE */}
         <TableContainer component={Paper}>
           <Table>
-            <TableHead>
+            <TableHead
+              sx={{
+                background: "#171654",
+              }}
+            >
               <TableRow>
-                <TableCell align="center">Mã</TableCell>
-                <TableCell align="center">Tên</TableCell>
-                <TableCell align="center">Tác giả</TableCell>
-                <TableCell align="center">Thể loại</TableCell>
-                <TableCell align="center">Trạng thái</TableCell>
-                <TableCell align="center">Số lượng</TableCell>
-                <TableCell align="center">Thao tác</TableCell>
+                <TableCell
+                  align="center"
+                  sx={{
+                    color: "white",
+                    fontWeight: "bold",
+                  }}
+                >
+                  Mã
+                </TableCell>
+
+                <TableCell
+                  align="center"
+                  sx={{
+                    color: "white",
+                    fontWeight: "bold",
+                  }}
+                >
+                  Tên
+                </TableCell>
+
+                <TableCell
+                  align="center"
+                  sx={{
+                    color: "white",
+                    fontWeight: "bold",
+                  }}
+                >
+                  Tác giả
+                </TableCell>
+
+                <TableCell
+                  align="center"
+                  sx={{
+                    color: "white",
+                    fontWeight: "bold",
+                  }}
+                >
+                  Thể loại
+                </TableCell>
+
+                <TableCell
+                  align="center"
+                  sx={{
+                    color: "white",
+                    fontWeight: "bold",
+                  }}
+                >
+                  Trạng thái
+                </TableCell>
+
+                <TableCell
+                  align="center"
+                  sx={{
+                    color: "white",
+                    fontWeight: "bold",
+                  }}
+                >
+                  Số lượng
+                </TableCell>
+
+                <TableCell
+                  align="center"
+                  sx={{
+                    color: "white",
+                    fontWeight: "bold",
+                  }}
+                >
+                  Thao tác
+                </TableCell>
               </TableRow>
             </TableHead>
 
             <TableBody>
-              {currentBooks.map((b) => (
-                <TableRow key={b.id}>
-                  <TableCell align="center">{b.id}</TableCell>
-                  <TableCell align="center">{b.name}</TableCell>
-                  <TableCell align="center">{b.author}</TableCell>
-                  <TableCell align="center">{b.category}</TableCell>
-                  <TableCell align="center">{b.status}</TableCell>
-                  <TableCell align="center">{b.quantity}</TableCell>
-
-                  <TableCell align="center">
-                    <Button onClick={() => editBook(b)}>
-                      <FaEdit />
-                    </Button>
-
-                    <Button
-                      color="error"
-                      onClick={() => setDeleteId(b.id)}
-                    >
-                      <FaTrash />
-                    </Button>
+              {currentBooks.length === 0 ? (
+                <TableRow>
+                  <TableCell
+                    colSpan={7}
+                    align="center"
+                  >
+                    Không có sách
                   </TableCell>
                 </TableRow>
-              ))}
+              ) : (
+                currentBooks.map((b) => (
+                  <TableRow key={b.id}>
+                    <TableCell align="center">
+                      {b.id}
+                    </TableCell>
+
+                    <TableCell align="center">
+                      {b.name}
+                    </TableCell>
+
+                    <TableCell align="center">
+                      {b.author}
+                    </TableCell>
+
+                    <TableCell align="center">
+                      {b.category}
+                    </TableCell>
+
+                    <TableCell align="center">
+                      {b.status}
+                    </TableCell>
+
+                    <TableCell align="center">
+                      {b.quantity}
+                    </TableCell>
+
+                    <TableCell align="center">
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        onClick={() =>
+                          editBook(b)
+                        }
+                      >
+                        <FaEdit />
+                      </Button>
+
+                      <Button
+                        size="small"
+                        color="error"
+                        variant="outlined"
+                        sx={{ ml: 1 }}
+                        onClick={() =>
+                          setDeleteId(b.id)
+                        }
+                      >
+                        <FaTrash />
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
             </TableBody>
           </Table>
         </TableContainer>
@@ -438,10 +702,16 @@ function Book() {
           />
         </Box>
 
-        {/* ADD / EDIT MODAL */}
-        <Dialog open={showModal} onClose={closeModal} fullWidth>
+        {/* MODAL */}
+        <Dialog
+          open={showModal}
+          onClose={closeModal}
+          fullWidth
+        >
           <DialogTitle>
-            {editId ? "Sửa sách" : "Thêm sách"}
+            {editId !== null
+              ? "Sửa sách"
+              : "Thêm sách"}
           </DialogTitle>
 
           <DialogContent>
@@ -473,12 +743,13 @@ function Book() {
 
             <Select
               fullWidth
-              value={form.category}
               sx={{ mt: 2 }}
+              value={form.category}
               onChange={(e) =>
                 setForm({
                   ...form,
-                  category: e.target.value,
+                  category:
+                    e.target.value,
                 })
               }
             >
@@ -508,7 +779,9 @@ function Book() {
               onChange={(e) =>
                 setForm({
                   ...form,
-                  quantity: e.target.value,
+                  quantity: Number(
+                    e.target.value
+                  ),
                 })
               }
             />
@@ -523,26 +796,35 @@ function Book() {
               variant="contained"
               onClick={saveBook}
             >
-              {editId ? "Cập nhật" : "Thêm"}
+              {editId !== null
+                ? "Cập nhật"
+                : "Thêm"}
             </Button>
           </DialogActions>
         </Dialog>
 
-        {/* DELETE CONFIRM */}
+        {/* DELETE */}
         <Dialog
           open={deleteId !== null}
-          onClose={() => setDeleteId(null)}
+          onClose={() =>
+            setDeleteId(null)
+          }
         >
           <DialogTitle>
             Xác nhận xóa
           </DialogTitle>
 
           <DialogContent>
-            Bạn có chắc muốn xóa sách này không?
+            Bạn có chắc muốn xóa sách này
+            không?
           </DialogContent>
 
           <DialogActions>
-            <Button onClick={() => setDeleteId(null)}>
+            <Button
+              onClick={() =>
+                setDeleteId(null)
+              }
+            >
               Hủy
             </Button>
 

@@ -10,6 +10,8 @@ import {
   InputAdornment,
   IconButton,
   Alert,
+  MenuItem,
+  Select,
 } from "@mui/material";
 
 import {
@@ -37,12 +39,15 @@ function Register() {
     name: "",
     email: "",
     password: "",
+    role: "staff",
   });
 
+  // REGISTER
   const handleRegister = () => {
     setError("");
     setSuccess("");
 
+    // CHECK EMPTY
     if (
       !form.name ||
       !form.email ||
@@ -54,10 +59,12 @@ function Register() {
       return;
     }
 
+    // GET USERS
     const users = JSON.parse(
       localStorage.getItem("libzone_users")
     ) || [];
 
+    // CHECK EMAIL
     const checkEmail = users.find(
       (item) => item.email === form.email
     );
@@ -67,15 +74,19 @@ function Register() {
       return;
     }
 
+    // NEW USER
     const newUser = {
       id: Date.now(),
       name: form.name,
       email: form.email,
       password: form.password,
+      role: form.role,
     };
 
+    // PUSH USER
     users.push(newUser);
 
+    // SAVE USERS
     localStorage.setItem(
       "libzone_users",
       JSON.stringify(users)
@@ -83,6 +94,15 @@ function Register() {
 
     setSuccess("Đăng ký thành công");
 
+    // RESET FORM
+    setForm({
+      name: "",
+      email: "",
+      password: "",
+      role: "staff",
+    });
+
+    // REDIRECT LOGIN
     setTimeout(() => {
       navigate("/");
     }, 1500);
@@ -149,6 +169,7 @@ function Register() {
           </Typography>
         </Box>
 
+        {/* ERROR */}
         {error && (
           <Alert
             severity="error"
@@ -161,6 +182,7 @@ function Register() {
           </Alert>
         )}
 
+        {/* SUCCESS */}
         {success && (
           <Alert
             severity="success"
@@ -241,6 +263,38 @@ function Register() {
                 },
             }}
           />
+        </Box>
+
+        {/* ROLE */}
+        <Box mb={3}>
+          <Typography
+            fontWeight="bold"
+            mb={1}
+          >
+            Vai trò
+          </Typography>
+
+          <Select
+            fullWidth
+            value={form.role}
+            onChange={(e) =>
+              setForm({
+                ...form,
+                role: e.target.value,
+              })
+            }
+            sx={{
+              borderRadius: "16px",
+            }}
+          >
+            <MenuItem value="admin">
+              Admin
+            </MenuItem>
+
+            <MenuItem value="staff">
+              Staff
+            </MenuItem>
+          </Select>
         </Box>
 
         {/* PASSWORD */}
@@ -324,6 +378,7 @@ function Register() {
           Đăng ký
         </Button>
 
+        {/* LOGIN */}
         <Typography
           textAlign="center"
           mt={3}
