@@ -35,7 +35,6 @@ import {
     FaUsers,
     FaExchangeAlt,
     FaCog,
-    FaFileAlt,
 } from "react-icons/fa";
 
 import { MdMenuBook } from "react-icons/md";
