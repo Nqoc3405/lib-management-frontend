@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 
 import {
@@ -10,18 +10,24 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
-  TextField,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
   Button,
-  Card,
-  CardContent,
-  Grid,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
+  TextField,
+  MenuItem,
+  Select,
   Pagination,
   Divider,
-  InputAdornment,
+  Chip,
 } from "@mui/material";
 
 import {
@@ -29,154 +35,135 @@ import {
   FaUsers,
   FaExchangeAlt,
   FaCog,
-  FaFileAlt,
-  FaSearch,
   FaPlus,
-  FaEdit,
+  FaCheck,
   FaTrash,
-  FaEnvelope,
-  FaPhone,
 } from "react-icons/fa";
 
 import { MdMenuBook } from "react-icons/md";
 
-function Reader() {
-  const [members, setMembers] = useState([
-    {
-      id: "DG001",
-      name: "Nguyễn Văn A",
-      email: "nguyenvana@email.com",
-      phone: "0901234567",
-      borrow: 3,
-    },
-    {
-      id: "DG002",
-      name: "Trần Thị B",
-      email: "tranthib@email.com",
-      phone: "0902345678",
-      borrow: 1,
-    },
-    {
-      id: "DG003",
-      name: "Lê Văn C",
-      email: "levanc@email.com",
-      phone: "0903456789",
-      borrow: 0,
-    },
-    {
-      id: "DG004",
-      name: "Phạm Thị D",
-      email: "phamthid@email.com",
-      phone: "0904567890",
-      borrow: 2,
-    },
-  ]);
+function Borrow() {
+  const [borrows, setBorrows] = useState(() => {
+    const saved = localStorage.getItem("borrows");
 
-  const [search, setSearch] = useState("");
-  const [open, setOpen] = useState(false);
-  const [editId, setEditId] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
-
-  const [form, setForm] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    borrow: 0,
+    return saved
+      ? JSON.parse(saved)
+      : [
+          {
+            id: "PM001",
+            reader: "Nguyễn Văn A",
+            book: "Đắc Nhân Tâm",
+            borrowDate: "2026-05-10",
+            returnDate: "2026-05-20",
+            status: "Đang mượn",
+          },
+        ];
   });
 
-  const perPage = 6;
+  const [open, setOpen] = useState(false);
 
-  const filteredMembers = members.filter(
-    (m) =>
-      m.name.toLowerCase().includes(search.toLowerCase()) ||
-      m.id.toLowerCase().includes(search.toLowerCase())
-  );
+  const [form, setForm] = useState({
+    reader: "",
+    book: "",
+    borrowDate: "",
+    returnDate: "",
+    status: "Đang mượn",
+  });
 
-  const totalPages = Math.ceil(
-    filteredMembers.length / perPage
-  );
+  const [currentPage, setCurrentPage] = useState(1);
 
-  const startIndex = (currentPage - 1) * perPage;
+  const perPage = 5;
 
-  const currentMembers = filteredMembers.slice(
-    startIndex,
-    startIndex + perPage
-  );
+  useEffect(() => {
+    localStorage.setItem(
+      "borrows",
+      JSON.stringify(borrows)
+    );
+  }, [borrows]);
 
-  const openModal = (member = null) => {
-    if (member) {
-      setEditId(member.id);
-      setForm(member);
-    } else {
-      setEditId(null);
-
-      setForm({
-        name: "",
-        email: "",
-        phone: "",
-        borrow: 0,
-      });
-    }
-
+  const openModal = () => {
     setOpen(true);
   };
 
   const closeModal = () => {
     setOpen(false);
+
+    setForm({
+      reader: "",
+      book: "",
+      borrowDate: "",
+      returnDate: "",
+      status: "Đang mượn",
+    });
   };
 
-  const saveMember = () => {
-    if (!form.name) {
-      alert("Nhập tên độc giả!");
+  const saveBorrow = () => {
+    if (
+      !form.reader ||
+      !form.book ||
+      !form.borrowDate ||
+      !form.returnDate
+    ) {
+      alert("Nhập đầy đủ thông tin!");
       return;
     }
 
-    if (editId) {
-      setMembers(
-        members.map((m) =>
-          m.id === editId ? { ...m, ...form } : m
-        )
-      );
-    } else {
-      const maxId =
-        members.length > 0
-          ? Math.max(
-              ...members.map((m) =>
-                parseInt(m.id.replace("DG", ""))
-              )
-            )
-          : 0;
+    const newId =
+      "PM" +
+      (borrows.length + 1)
+        .toString()
+        .padStart(3, "0");
 
-      setMembers([
-        ...members,
-        {
-          id:
-            "DG" +
-            (maxId + 1)
-              .toString()
-              .padStart(3, "0"),
-          ...form,
-        },
-      ]);
-    }
+    setBorrows([
+      ...borrows,
+      {
+        id: newId,
+        ...form,
+      },
+    ]);
 
     closeModal();
   };
 
-  const deleteMember = (id) => {
+  const returnBook = (id) => {
+    setBorrows(
+      borrows.map((b) =>
+        b.id === id
+          ? {
+              ...b,
+              status: "Đã trả",
+            }
+          : b
+      )
+    );
+  };
+
+  const deleteBorrow = (id) => {
     if (
       window.confirm(
-        "Bạn có chắc muốn xóa độc giả này?"
+        "Bạn có chắc muốn xóa phiếu mượn?"
       )
     ) {
-      setMembers(
-        members.filter((m) => m.id !== id)
+      setBorrows(
+        borrows.filter((b) => b.id !== id)
       );
     }
   };
 
+  const totalPages = Math.ceil(
+    borrows.length / perPage
+  );
+
+  const startIndex =
+    (currentPage - 1) * perPage;
+
+  const currentBorrows = borrows.slice(
+    startIndex,
+    startIndex + perPage
+  );
+
   return (
-<Box
+    <Box
       sx={{
         display: "flex",
         minHeight: "100vh",
@@ -365,7 +352,6 @@ function Reader() {
         </Box>
       </Drawer>
 
-
       {/* MAIN */}
       <Box
         sx={{
@@ -377,7 +363,8 @@ function Reader() {
         <Box
           sx={{
             display: "flex",
-            justifyContent: "space-between",
+            justifyContent:
+              "space-between",
             alignItems: "center",
             mb: 4,
           }}
@@ -387,183 +374,129 @@ function Reader() {
               variant="h4"
               fontWeight="bold"
             >
-              Quản lý độc giả
+              Mượn / Trả sách
             </Typography>
 
             <Typography color="gray">
-              Danh sách tất cả độc giả trong
-              thư viện
+              Quản lý phiếu mượn sách
             </Typography>
           </Box>
 
           <Button
             variant="contained"
             startIcon={<FaPlus />}
-            onClick={() => openModal()}
+            onClick={openModal}
           >
-            Thêm độc giả
+            Tạo phiếu mượn
           </Button>
         </Box>
 
-        {/* SEARCH */}
-        <TextField
-          fullWidth
-          placeholder="Tìm kiếm độc giả..."
-          value={search}
-          onChange={(e) => {
-            setSearch(e.target.value);
-            setCurrentPage(1);
+        {/* TABLE */}
+        <TableContainer
+          component={Paper}
+          sx={{
+            borderRadius: 4,
           }}
-          sx={{ mb: 4 }}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <FaSearch />
-              </InputAdornment>
-            ),
-          }}
-        />
+        >
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell align="center">
+                  Mã phiếu
+                </TableCell>
 
-        {/* CARD LIST */}
-        <Grid container spacing={3}>
-          {currentMembers.map((m) => (
-            <Grid
-              item
-              xs={12}
-              md={6}
-              lg={4}
-              key={m.id}
-            >
-              <Card
-                sx={{
-                  borderRadius: 4,
-                  height: "100%",
-                }}
-              >
-                <CardContent>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      gap: 2,
-                      mb: 3,
-                    }}
-                  >
-                    <Box
-                      sx={{
-                        width: 60,
-                        height: 60,
-                        borderRadius: "50%",
-                        bgcolor: "#eef2ff",
-                        color: "#4338ca",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        fontWeight: "bold",
-                        fontSize: 24,
-                      }}
-                    >
-                      {m.name.charAt(0)}
-                    </Box>
+                <TableCell align="center">
+                  Độc giả
+                </TableCell>
 
-                    <Box>
-                      <Typography
-                        fontWeight="bold"
-                        fontSize={20}
-                      >
-                        {m.name}
-                      </Typography>
+                <TableCell align="center">
+                  Sách
+                </TableCell>
 
-                      <Typography
-                        color="gray"
-                        fontSize={13}
-                      >
-                        {m.id}
-                      </Typography>
-                    </Box>
-                  </Box>
+                <TableCell align="center">
+                  Ngày mượn
+                </TableCell>
 
-                  <Box sx={{ mb: 3 }}>
-                    <Typography
-                      sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 1,
-                        mb: 1,
-                        color: "gray",
-                      }}
-                    >
-                      <FaEnvelope />
-                      {m.email}
-                    </Typography>
+                <TableCell align="center">
+                  Hạn trả
+                </TableCell>
 
-                    <Typography
-                      sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 1,
-                        color: "gray",
-                      }}
-                    >
-                      <FaPhone />
-                      {m.phone}
-                    </Typography>
-                  </Box>
+                <TableCell align="center">
+                  Trạng thái
+                </TableCell>
 
-                  <Divider sx={{ mb: 2 }} />
+                <TableCell align="center">
+                  Thao tác
+                </TableCell>
+              </TableRow>
+            </TableHead>
 
-                  <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent:
-                        "space-between",
-                      alignItems: "center",
-                    }}
-                  >
-                    <Box>
-                      <Typography
-                        fontSize={12}
-                        color="gray"
-                      >
-                        Đang mượn
-                      </Typography>
+            <TableBody>
+              {currentBorrows.map((b) => (
+                <TableRow key={b.id}>
+                  <TableCell align="center">
+                    {b.id}
+                  </TableCell>
 
-                      <Typography
-                        fontWeight="bold"
-                        fontSize={28}
-                      >
-                        {m.borrow}
-                      </Typography>
-                    </Box>
+                  <TableCell align="center">
+                    {b.reader}
+                  </TableCell>
 
-                    <Box>
+                  <TableCell align="center">
+                    {b.book}
+                  </TableCell>
+
+                  <TableCell align="center">
+                    {b.borrowDate}
+                  </TableCell>
+
+                  <TableCell align="center">
+                    {b.returnDate}
+                  </TableCell>
+
+                  <TableCell align="center">
+                    <Chip
+                      label={b.status}
+                      color={
+                        b.status === "Đã trả"
+                          ? "success"
+                          : "warning"
+                      }
+                    />
+                  </TableCell>
+
+                  <TableCell align="center">
+                    {b.status ===
+                      "Đang mượn" && (
                       <Button
+                        color="success"
                         onClick={() =>
-                          openModal(m)
+                          returnBook(b.id)
                         }
                       >
-                        <FaEdit />
+                        <FaCheck />
                       </Button>
+                    )}
 
-                      <Button
-                        color="error"
-                        onClick={() =>
-                          deleteMember(m.id)
-                        }
-                      >
-                        <FaTrash />
-                      </Button>
-                    </Box>
-                  </Box>
-                </CardContent>
-              </Card>
-            </Grid>
-          ))}
-        </Grid>
+                    <Button
+                      color="error"
+                      onClick={() =>
+                        deleteBorrow(b.id)
+                      }
+                    >
+                      <FaTrash />
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
 
         {/* PAGINATION */}
         <Box
           sx={{
-            mt: 4,
+            mt: 3,
             display: "flex",
             justifyContent: "center",
           }}
@@ -585,66 +518,91 @@ function Reader() {
           fullWidth
         >
           <DialogTitle>
-            {editId
-              ? "Sửa độc giả"
-              : "Thêm độc giả"}
+            Tạo phiếu mượn
           </DialogTitle>
 
           <DialogContent>
             <TextField
               fullWidth
-              label="Họ tên"
+              label="Tên độc giả"
               margin="normal"
-              value={form.name}
+              value={form.reader}
               onChange={(e) =>
                 setForm({
                   ...form,
-                  name: e.target.value,
+                  reader: e.target.value,
                 })
               }
             />
 
             <TextField
               fullWidth
-              label="Email"
+              label="Tên sách"
               margin="normal"
-              value={form.email}
+              value={form.book}
               onChange={(e) =>
                 setForm({
                   ...form,
-                  email: e.target.value,
+                  book: e.target.value,
                 })
               }
             />
 
             <TextField
               fullWidth
-              label="Số điện thoại"
+              type="date"
               margin="normal"
-              value={form.phone}
+              label="Ngày mượn"
+              InputLabelProps={{
+                shrink: true,
+              }}
+              value={form.borrowDate}
               onChange={(e) =>
                 setForm({
                   ...form,
-                  phone: e.target.value,
+                  borrowDate:
+                    e.target.value,
                 })
               }
             />
 
             <TextField
               fullWidth
-              type="number"
-              label="Số sách đang mượn"
+              type="date"
               margin="normal"
-              value={form.borrow}
+              label="Hạn trả"
+              InputLabelProps={{
+                shrink: true,
+              }}
+              value={form.returnDate}
               onChange={(e) =>
                 setForm({
                   ...form,
-                  borrow: Number(
-                    e.target.value
-                  ),
+                  returnDate:
+                    e.target.value,
                 })
               }
             />
+
+            <Select
+              fullWidth
+              value={form.status}
+              sx={{ mt: 2 }}
+              onChange={(e) =>
+                setForm({
+                  ...form,
+                  status: e.target.value,
+                })
+              }
+            >
+              <MenuItem value="Đang mượn">
+                Đang mượn
+              </MenuItem>
+
+              <MenuItem value="Đã trả">
+                Đã trả
+              </MenuItem>
+            </Select>
           </DialogContent>
 
           <DialogActions>
@@ -654,9 +612,9 @@ function Reader() {
 
             <Button
               variant="contained"
-              onClick={saveMember}
+              onClick={saveBorrow}
             >
-              {editId ? "Cập nhật" : "Thêm"}
+              Lưu
             </Button>
           </DialogActions>
         </Dialog>
@@ -665,4 +623,4 @@ function Reader() {
   );
 }
 
-export default Reader;
+export default Borrow;

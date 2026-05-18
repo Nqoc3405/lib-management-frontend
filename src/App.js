@@ -2,6 +2,8 @@ import { Routes, Route } from "react-router-dom";
 import Interface from "./components/Interface";
 import Book from "./components/Book";
 import Reader from "./components/Reader"
+import Borrow from "./components/Borrow";
+import Settings from "./components/Settings";
 
 function App() {
   return (
@@ -9,7 +11,8 @@ function App() {
       <Route path="/home" element={<Interface />} />
       <Route path="/book" element={<Book />} />
       <Route path="/reader" element={<Reader />} />
-
+      <Route path="/borrow" element={<Borrow />} />
+      <Route path="/settings" element={<Settings />} />
     </Routes>
   );
 }
