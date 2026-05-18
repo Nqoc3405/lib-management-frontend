@@ -27,7 +27,7 @@ import {
     Popover,
     Divider,
 } from "@mui/material";
-
+import { useNavigate } from "react-router-dom";
 import {
     FaBell,
     FaReact,
@@ -35,9 +35,7 @@ import {
     FaUsers,
     FaExchangeAlt,
     FaCog,
-    FaFileAlt,
 } from "react-icons/fa";
-
 import { MdMenuBook } from "react-icons/md";
 
 function Interface() {
@@ -52,6 +50,12 @@ function Interface() {
             status: "Đang mượn",
         },
     ];
+    const navigate = useNavigate();
+
+    // eslint-disable-next-line no-unused-vars
+    const handleLogout = () => {localStorage.removeItem("libzone_login"); 
+        navigate("/");
+};
 
     const handleNotifyClick = (event) => {
         setAnchorEl(anchorEl ? null : event.currentTarget);
@@ -315,19 +319,15 @@ function Interface() {
                         </Box>
 
                         {/* ADMIN */}
-                        <Box
-                            sx={{
-                                display: "flex",
-                                alignItems: "center",
-                                gap: 1,
-                            }}
-                        >
-                            <FaReact size={40} color="#61dafb" />
-
-                            <Typography fontSize={20} fontWeight={500}>
-                                Admin
-                            </Typography>
-                        </Box>
+                        <Button variant="contained" href="/"
+                         sx={{
+                           mt: -1,
+                           borderRadius: "12px",
+                           textTransform: "none",
+                             }}
+                            >
+                          Đăng nhập
+                           </Button>
                     </Box>
                 </Box>
 
@@ -355,7 +355,7 @@ function Interface() {
                             Thêm sách mới
                         </Button>
 
-                        <Button variant="contained" color="secondary">
+                        <Button href="reader" variant="contained" color="secondary">
                             Tra cứu độc giả
                         </Button>
                     </Box>
