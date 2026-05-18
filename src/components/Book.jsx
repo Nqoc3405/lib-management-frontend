@@ -141,126 +141,195 @@ function Book() {
   );
 
   return (
-   <Box
+ <Box
+       sx={{
+         display: "flex",
+         minHeight: "100vh",
+         bgcolor: "#f5f5f5",
+       }}
+     >
+       {/* SIDEBAR */}
+       <Drawer
+         variant="permanent"
+         sx={{
+           width: 280,
+           flexShrink: 0,
+           "& .MuiDrawer-paper": {
+             width: 280,
+             bgcolor: "#171654",
+             color: "white",
+             p: 2,
+             boxSizing: "border-box",
+           },
+         }}
+       >
+         <Box>
+           {/* LOGO */}
+           <Box
+             sx={{
+               display: "flex",
+               alignItems: "center",
+               gap: 1.5,
+               mb: 4,
+             }}
+           >
+             <MdMenuBook
+               size={46}
+               color="#facc15"
+             />
+ 
+             <Typography
+               sx={{
+                 fontSize: 40,
+                 fontWeight: "bold",
+               }}
+             >
+               LibZone
+             </Typography>
+           </Box>
+ 
+           {/* MENU */}
+           <List>
+             <ListItem disablePadding>
+               <ListItemButton
+                 component={Link}
+                 to="/home"
                  sx={{
-                   display: "flex",
-                   minHeight: "100vh",
-                   bgcolor: "#f5f5f5",
+                   borderRadius: 2,
+                   mb: 1,
                  }}
                >
-                 {/* SIDEBAR */}
-                 <Drawer
-                   variant="permanent"
+                 <ListItemIcon
                    sx={{
-                     width: 300,
-                     flexShrink: 0,
-                     "& .MuiDrawer-paper": {
-                       width: 300,
-                       boxSizing: "border-box",
-                       bgcolor: "#171654",
-                       color: "white",
-                       display: "flex",
-                       justifyContent: "space-between",
-                       p: 2,
-                     },
+                     color: "white",
+                     minWidth: 40,
                    }}
                  >
-                   <Box>
-                     {/* LOGO */}
-                     <Box
-                       sx={{
-                         display: "flex",
-                         marginTop: 3,
-                         marginLeft: "20%",
-                         alignItems: "center",
-                         gap: 2,
-                         mb: 4,
-                       }}
-                     >
-                       <MdMenuBook size={40} color="#facc15" />
-           
-                       <Typography sx={{ fontSize: 24, fontWeight: "bold" }}>
-                         LibZone
-                       </Typography>
-                     </Box>
-           
-                     {/* MENU */}
-                     <List>
-                       <ListItem disablePadding>
-                         <ListItemButton component={Link} to="/home">
-                           <ListItemIcon sx={{ color: "white" }}>
-                             <FaBook />
-                           </ListItemIcon>
-           
-                           <ListItemText primary="TỔNG QUAN" 
-                           primaryTypographyProps={{ fontWeight: "bold" }}
-                           />
-                         </ListItemButton>
-                       </ListItem>
-           
-                       <ListItem disablePadding>
-                         <ListItemButton component={Link} to="/book">
-                           <ListItemIcon sx={{ color: "white" }}>
-                             <FaBook />
-                           </ListItemIcon>
-           
-                           <ListItemText primary="QUẢN LÝ SÁCH" 
-                           primaryTypographyProps={{ fontWeight: "bold" }}
-                           />
-                         </ListItemButton>
-                       </ListItem>
-           
-                       <ListItem disablePadding>
-                         <ListItemButton component={Link} to="/reader">
-                           <ListItemIcon sx={{ color: "white" }}>
-                             <FaUsers />
-                           </ListItemIcon>
-           
-                           <ListItemText primary="QUẢN LÝ ĐỘC GIẢ" 
-                           primaryTypographyProps={{ fontWeight: "bold" }}
-                           />
-                         </ListItemButton>
-                       </ListItem>
-           
-                       <ListItem disablePadding>
-                         <ListItemButton component={Link} to="/borrow">
-                           <ListItemIcon sx={{ color: "white" }}>
-                             <FaExchangeAlt />
-                           </ListItemIcon>
-           
-                           <ListItemText primary="MƯỢN / TRẢ SÁCH" 
-                           primaryTypographyProps={{ fontWeight: "bold" }}
-                           />
-                         </ListItemButton>
-                       </ListItem>
-                     </List>
-                   </Box>
-           
-                   {/* BOTTOM */}
-                   <Box>
-                     <Divider
-                       sx={{
-                         bgcolor: "rgba(255,255,255,0.2)",
-                         mb: 2,
-                       }}
-                     />
-           
-                     <List>
-           
-                       <ListItem disablePadding>
-                         <ListItemButton>
-                           <ListItemIcon sx={{ color: "white" }}>
-                             <FaCog />
-                           </ListItemIcon>
-           
-                           <ListItemText primary="CÀI ĐẶT" 
-                           primaryTypographyProps={{ fontWeight: "bold" }}
-                           />
-                         </ListItemButton>
-                       </ListItem>
-                     </List>
-                   </Box>
-                 </Drawer>
+                   <FaBook />
+                 </ListItemIcon>
+ 
+                 <ListItemText
+                   primary="Tổng quan"
+                   primaryTypographyProps={{
+                     fontWeight: "bold",
+                   }}
+                 />
+               </ListItemButton>
+             </ListItem>
+ 
+             <ListItem disablePadding>
+               <ListItemButton
+                 component={Link}
+                 to="/book"
+                 sx={{
+                   borderRadius: 2,
+                   mb: 1,
+                 }}
+               >
+                 <ListItemIcon
+                   sx={{
+                     color: "white",
+                     minWidth: 40,
+                   }}
+                 >
+                   <FaBook />
+                 </ListItemIcon>
+ 
+                 <ListItemText
+                   primary="Quản lý sách"
+                   primaryTypographyProps={{
+                     fontWeight: "bold",
+                   }}
+                 />
+               </ListItemButton>
+             </ListItem>
+ 
+             <ListItem disablePadding>
+               <ListItemButton
+                 component={Link}
+                 to="/reader"
+                 sx={{
+                   borderRadius: 2,
+                   mb: 1,
+                 }}
+               >
+                 <ListItemIcon
+                   sx={{
+                     color: "white",
+                     minWidth: 40,
+                   }}
+                 >
+                   <FaUsers />
+                 </ListItemIcon>
+ 
+                 <ListItemText
+                   primary="Quản lý độc giả"
+                   primaryTypographyProps={{
+                     fontWeight: "bold",
+                   }}
+                 />
+               </ListItemButton>
+             </ListItem>
+ 
+             <ListItem disablePadding>
+               <ListItemButton
+                 component={Link}
+                 to="/borrow"
+               >
+                 <ListItemIcon
+                   sx={{
+                     color: "white",
+                     minWidth: 40,
+                   }}
+                 >
+                   <FaExchangeAlt />
+                 </ListItemIcon>
+ 
+                 <ListItemText
+                   primary="Mượn / Trả sách"
+                   primaryTypographyProps={{
+                     fontWeight: "bold",
+                   }}
+                 />
+               </ListItemButton>
+             </ListItem>
+           </List>
+         </Box>
+ 
+         {/* BOTTOM */}
+         <Box sx={{ mt: "auto" }}>
+           <Divider
+             sx={{
+               bgcolor:
+                 "rgba(255,255,255,0.2)",
+               mb: 2,
+             }}
+           />
+ 
+           <List>
+             <ListItem disablePadding>
+               <ListItemButton component={Link} to="/settings">
+                 <ListItemIcon
+                   sx={{
+                     color: "white",
+                     minWidth: 40,
+                   }}
+                 >
+                   <FaCog />
+                 </ListItemIcon>
+ 
+                 <ListItemText
+                   primary="Cài đặt"
+                   primaryTypographyProps={{
+                     fontWeight: "bold",
+                   }}
+                 />
+               </ListItemButton>
+             </ListItem>
+           </List>
+         </Box>
+       </Drawer>
+ 
       {/* MAIN */}
       <Box
         sx={{

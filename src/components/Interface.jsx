@@ -27,7 +27,7 @@ import {
     Popover,
     Divider,
 } from "@mui/material";
-
+import { useNavigate } from "react-router-dom";
 import {
     FaBell,
     FaReact,
@@ -36,7 +36,6 @@ import {
     FaExchangeAlt,
     FaCog,
 } from "react-icons/fa";
-
 import { MdMenuBook } from "react-icons/md";
 
 function Interface() {
@@ -51,6 +50,12 @@ function Interface() {
             status: "Đang mượn",
         },
     ];
+    const navigate = useNavigate();
+
+    // eslint-disable-next-line no-unused-vars
+    const handleLogout = () => {localStorage.removeItem("libzone_login"); 
+        navigate("/");
+};
 
     const handleNotifyClick = (event) => {
         setAnchorEl(anchorEl ? null : event.currentTarget);
@@ -60,125 +65,194 @@ function Interface() {
 
     return (
          <Box
-              sx={{
-                display: "flex",
-                minHeight: "100vh",
-                bgcolor: "#f5f5f5",
-              }}
-            >
-              {/* SIDEBAR */}
-              <Drawer
-                variant="permanent"
-                sx={{
-                  width: 300,
-                  flexShrink: 0,
-                  "& .MuiDrawer-paper": {
-                    width: 300,
-                    boxSizing: "border-box",
-                    bgcolor: "#171654",
-                    color: "white",
-                    display: "flex",
-                    justifyContent: "space-between",
-                    p: 2,
-                  },
-                }}
-              >
-                <Box>
-                  {/* LOGO */}
-                  <Box
-                    sx={{
-                      display: "flex",
-                      marginTop: 3,
-                      marginLeft: "20%",
-                      alignItems: "center",
-                      gap: 2,
-                      mb: 4,
-                    }}
-                  >
-                    <MdMenuBook size={40} color="#facc15" />
-        
-                    <Typography sx={{ fontSize: 24, fontWeight: "bold" }}>
-                      LibZone
-                    </Typography>
-                  </Box>
-        
-                  {/* MENU */}
-                  <List>
-                    <ListItem disablePadding>
-                      <ListItemButton component={Link} to="/home">
-                        <ListItemIcon sx={{ color: "white" }}>
-                          <FaBook />
-                        </ListItemIcon>
-        
-                        <ListItemText primary="TỔNG QUAN" 
-                        primaryTypographyProps={{ fontWeight: "bold" }}
-                        />
-                      </ListItemButton>
-                    </ListItem>
-        
-                    <ListItem disablePadding>
-                      <ListItemButton component={Link} to="/book">
-                        <ListItemIcon sx={{ color: "white" }}>
-                          <FaBook />
-                        </ListItemIcon>
-        
-                        <ListItemText primary="QUẢN LÝ SÁCH" 
-                        primaryTypographyProps={{ fontWeight: "bold" }}
-                        />
-                      </ListItemButton>
-                    </ListItem>
-        
-                    <ListItem disablePadding>
-                      <ListItemButton component={Link} to="/reader">
-                        <ListItemIcon sx={{ color: "white" }}>
-                          <FaUsers />
-                        </ListItemIcon>
-        
-                        <ListItemText primary="QUẢN LÝ ĐỘC GIẢ" 
-                        primaryTypographyProps={{ fontWeight: "bold" }}
-                        />
-                      </ListItemButton>
-                    </ListItem>
-        
-                    <ListItem disablePadding>
-                      <ListItemButton component={Link} to="/borrow">
-                        <ListItemIcon sx={{ color: "white" }}>
-                          <FaExchangeAlt />
-                        </ListItemIcon>
-        
-                        <ListItemText primary="MƯỢN / TRẢ SÁCH" 
-                        primaryTypographyProps={{ fontWeight: "bold" }}
-                        />
-                      </ListItemButton>
-                    </ListItem>
-                  </List>
-                </Box>
-        
-                {/* BOTTOM */}
-                <Box>
-                  <Divider
-                    sx={{
-                      bgcolor: "rgba(255,255,255,0.2)",
-                      mb: 2,
-                    }}
-                  />
-        
-                  <List>
-        
-                    <ListItem disablePadding>
-                      <ListItemButton>
-                        <ListItemIcon sx={{ color: "white" }}>
-                          <FaCog />
-                        </ListItemIcon>
-        
-                        <ListItemText primary="CÀI ĐẶT" 
-                        primaryTypographyProps={{ fontWeight: "bold" }}
-                        />
-                      </ListItemButton>
-                    </ListItem>
-                  </List>
-                </Box>
-              </Drawer>
+               sx={{
+                 display: "flex",
+                 minHeight: "100vh",
+                 bgcolor: "#f5f5f5",
+               }}
+             >
+               {/* SIDEBAR */}
+               <Drawer
+                 variant="permanent"
+                 sx={{
+                   width: 280,
+                   flexShrink: 0,
+                   "& .MuiDrawer-paper": {
+                     width: 280,
+                     bgcolor: "#171654",
+                     color: "white",
+                     p: 2,
+                     boxSizing: "border-box",
+                   },
+                 }}
+               >
+                 <Box>
+                   {/* LOGO */}
+                   <Box
+                     sx={{
+                       display: "flex",
+                       alignItems: "center",
+                       gap: 1.5,
+                       mb: 4,
+                     }}
+                   >
+                     <MdMenuBook
+                       size={46}
+                       color="#facc15"
+                     />
+         
+                     <Typography
+                       sx={{
+                         fontSize: 40,
+                         fontWeight: "bold",
+                       }}
+                     >
+                       LibZone
+                     </Typography>
+                   </Box>
+         
+                   {/* MENU */}
+                   <List>
+                     <ListItem disablePadding>
+                       <ListItemButton
+                         component={Link}
+                         to="/home"
+                         sx={{
+                           borderRadius: 2,
+                           mb: 1,
+                         }}
+                       >
+                         <ListItemIcon
+                           sx={{
+                             color: "white",
+                             minWidth: 40,
+                           }}
+                         >
+                           <FaBook />
+                         </ListItemIcon>
+         
+                         <ListItemText
+                           primary="Tổng quan"
+                           primaryTypographyProps={{
+                             fontWeight: "bold",
+                           }}
+                         />
+                       </ListItemButton>
+                     </ListItem>
+         
+                     <ListItem disablePadding>
+                       <ListItemButton
+                         component={Link}
+                         to="/book"
+                         sx={{
+                           borderRadius: 2,
+                           mb: 1,
+                         }}
+                       >
+                         <ListItemIcon
+                           sx={{
+                             color: "white",
+                             minWidth: 40,
+                           }}
+                         >
+                           <FaBook />
+                         </ListItemIcon>
+         
+                         <ListItemText
+                           primary="Quản lý sách"
+                           primaryTypographyProps={{
+                             fontWeight: "bold",
+                           }}
+                         />
+                       </ListItemButton>
+                     </ListItem>
+         
+                     <ListItem disablePadding>
+                       <ListItemButton
+                         component={Link}
+                         to="/reader"
+                         sx={{
+                           borderRadius: 2,
+                           mb: 1,
+                         }}
+                       >
+                         <ListItemIcon
+                           sx={{
+                             color: "white",
+                             minWidth: 40,
+                           }}
+                         >
+                           <FaUsers />
+                         </ListItemIcon>
+         
+                         <ListItemText
+                           primary="Quản lý độc giả"
+                           primaryTypographyProps={{
+                             fontWeight: "bold",
+                           }}
+                         />
+                       </ListItemButton>
+                     </ListItem>
+         
+                     <ListItem disablePadding>
+                       <ListItemButton
+                         component={Link}
+                         to="/borrow"
+                       >
+                         <ListItemIcon
+                           sx={{
+                             color: "white",
+                             minWidth: 40,
+                           }}
+                         >
+                           <FaExchangeAlt />
+                         </ListItemIcon>
+         
+                         <ListItemText
+                           primary="Mượn / Trả sách"
+                           primaryTypographyProps={{
+                             fontWeight: "bold",
+                           }}
+                         />
+                       </ListItemButton>
+                     </ListItem>
+                   </List>
+                 </Box>
+         
+                 {/* BOTTOM */}
+                 <Box sx={{ mt: "auto" }}>
+                   <Divider
+                     sx={{
+                       bgcolor:
+                         "rgba(255,255,255,0.2)",
+                       mb: 2,
+                     }}
+                   />
+         
+                   <List>
+                     <ListItem disablePadding>
+                       <ListItemButton component={Link} to="/settings">
+                         <ListItemIcon
+                           sx={{
+                             color: "white",
+                             minWidth: 40,
+                           }}
+                         >
+                           <FaCog />
+                         </ListItemIcon>
+         
+                         <ListItemText
+                           primary="Cài đặt"
+                           primaryTypographyProps={{
+                             fontWeight: "bold",
+                           }}
+                         />
+                       </ListItemButton>
+                     </ListItem>
+                   </List>
+                 </Box>
+               </Drawer>
+         
 
             {/* MAIN */}
             <Box sx={{ flex: 1, p: 4 }}>
@@ -245,19 +319,15 @@ function Interface() {
                         </Box>
 
                         {/* ADMIN */}
-                        <Box
-                            sx={{
-                                display: "flex",
-                                alignItems: "center",
-                                gap: 1,
-                            }}
-                        >
-                            <FaReact size={40} color="#61dafb" />
-
-                            <Typography fontSize={20} fontWeight={500}>
-                                Admin
-                            </Typography>
-                        </Box>
+                        <Button variant="contained" href="/"
+                         sx={{
+                           mt: -1,
+                           borderRadius: "12px",
+                           textTransform: "none",
+                             }}
+                            >
+                          Đăng nhập
+                           </Button>
                     </Box>
                 </Box>
 
@@ -285,7 +355,7 @@ function Interface() {
                             Thêm sách mới
                         </Button>
 
-                        <Button variant="contained" color="secondary">
+                        <Button href="reader" variant="contained" color="secondary">
                             Tra cứu độc giả
                         </Button>
                     </Box>
