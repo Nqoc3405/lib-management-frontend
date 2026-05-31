@@ -44,7 +44,7 @@ function Login() {
     );
 
     if (data?.isLogin) {
-      navigate("/home");
+      navigate("/");
     }
 
     // AUTO CREATE ADMIN
@@ -62,6 +62,7 @@ function Login() {
           role: "admin",
         },
       ];
+      localStorage.setItem("role", adminAccount[0].role);
 
       localStorage.setItem(
         "libzone_users",
@@ -123,6 +124,7 @@ function Login() {
           role: user.role,
         })
       );
+      localStorage.setItem("role", user.role);
 
       // REMEMBER EMAIL
       if (form.remember) {
