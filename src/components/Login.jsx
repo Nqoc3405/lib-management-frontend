@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { Link } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 import {
   Box,
@@ -45,9 +44,33 @@ function Login() {
     );
 
     if (data?.isLogin) {
-      navigate("/home");
+      navigate("/");
     }
 
+    // AUTO CREATE ADMIN
+    const users = JSON.parse(
+      localStorage.getItem("libzone_users")
+    );
+
+    if (!users || users.length === 0) {
+      const adminAccount = [
+        {
+          id: 1,
+          name: "Admin",
+          email: "admin@gmail.com",
+          password: "123456",
+          role: "admin",
+        },
+      ];
+      localStorage.setItem("role", adminAccount[0].role);
+
+      localStorage.setItem(
+        "libzone_users",
+        JSON.stringify(adminAccount)
+      );
+    }
+
+    // REMEMBER EMAIL
     const rememberEmail =
       localStorage.getItem("remember_email");
 
@@ -64,22 +87,44 @@ function Login() {
   const handleLogin = () => {
     setError("");
 
+    // CHECK EMPTY
     if (!form.email || !form.password) {
-      setError("Vui lòng nhập đầy đủ thông tin");
+      setError(
+        "Vui lòng nhập đầy đủ thông tin"
+      );
       return;
     }
 
-    if (
-      form.email === "admin@gmail.com" &&
-      form.password === "123456"
-    ) {
+    // GET USERS
+    const users =
+      JSON.parse(
+        localStorage.getItem(
+          "libzone_users"
+        )
+      ) || [];
+
+    // FIND USER
+    const user = users.find(
+      (item) =>
+        item.email.trim() ===
+          form.email.trim() &&
+        item.password ===
+          form.password
+    );
+
+    // LOGIN SUCCESS
+    if (user) {
       localStorage.setItem(
         "libzone_login",
         JSON.stringify({
           isLogin: true,
-          email: form.email,
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
         })
       );
+      localStorage.setItem("role", user.role);
 
       // REMEMBER EMAIL
       if (form.remember) {
@@ -317,19 +362,26 @@ function Login() {
             Quên mật khẩu?
           </Typography>
         </Box>
-       <Typography textAlign="center" mt={3}>
-        Chưa có tài khoản?{" "}
-  <Link
-    to="/register"
-    style={{
-      color: "#4f46e5",
-      fontWeight: "bold",
-      textDecoration: "none",
-    }}
-  >
-    Đăng ký
-  </Link>
-</Typography>
+
+        {/* REGISTER */}
+        <Typography
+          textAlign="center"
+          mt={3}
+          mb={3}
+        >
+          Chưa có tài khoản?{" "}
+          <Link
+            to="/register"
+            style={{
+              color: "#4f46e5",
+              fontWeight: "bold",
+              textDecoration: "none",
+            }}
+          >
+            Đăng ký
+          </Link>
+        </Typography>
+
         {/* LOGIN BUTTON */}
         <Button
           fullWidth

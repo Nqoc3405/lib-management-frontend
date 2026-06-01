@@ -29,7 +29,6 @@ import {
   FaUsers,
   FaExchangeAlt,
   FaCog,
-  FaFileAlt,
   FaSearch,
   FaPlus,
   FaEdit,
