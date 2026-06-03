@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  Box, Typography, Avatar, TextField, InputAdornment, Button, IconButton, Dialog, DialogTitle, DialogContent, DialogActions, Select, MenuItem, Card, Grid, Paper, Tabs, Tab, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Divider
+  Box, Typography, Avatar, TextField, InputAdornment, Button, IconButton, Dialog, DialogTitle, DialogContent, DialogActions, Select, MenuItem, Grid, Paper, Tabs, Tab, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Divider, Drawer
 } from '@mui/material';
 import {
-  Dashboard, MenuBook, People, Person as PersonIcon, SwapHoriz, Search, Add, FileDownload, Work, BeachAccess, AssignmentInd, MoreVert, Edit, Delete
+  People, Search, Add, Work, BeachAccess, MoreVert, Edit, Delete
 } from '@mui/icons-material';
-import { FaBook, FaUsers, FaExchangeAlt, FaCog, FaUserTie } from 'react-icons/fa';
+import { FaBook, FaUsers, FaExchangeAlt, FaCog, FaUser } from 'react-icons/fa';
+import { MdMenuBook } from 'react-icons/md';
 
 const STORAGE_KEY = 'libzone_employees';
 
@@ -19,6 +20,7 @@ const initialData = [
 
 const Person = () => {
   const [employees, setEmployees] = useState([]);
+  const [search, setSearch] = useState('');
   const [tabValue, setTabValue] = useState(0);
   const [openDetail, setOpenDetail] = useState(false);
   const [selectedEmp, setSelectedEmp] = useState(null);
@@ -43,30 +45,19 @@ const Person = () => {
     }
   }, [employees]);
 
-  // Hàm click để thêm nhanh 1 nhân viên mới vào bộ nhớ localStorage
-  const handleAddEmployee = () => {
-    const newEmp = {
-      id: Date.now(),
-      name: 'Nhân viên Mới',
-      code: `NV00${employees.length + 1}`,
-      email: `new.${employees.length + 1}@libzone.vn`,
-      phone: '0900000000',
-      address: 'Chưa cập nhật',
-      status: 'Đang làm việc',
-      role: 'Nhân viên'
-    };
-    const updated = [...employees, newEmp];
-    setEmployees(updated);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-  };
-
   // Tính toán nhanh số liệu thống kê cho các Card chỉ số
   const total = employees.length;
   const working = employees.filter(e => e.status === 'Đang làm việc').length;
   const off = employees.filter(e => e.status === 'Nghỉ phép').length;
-  const rolesCount = new Set(employees.map(e => e.role)).size;
 
   const filteredEmployees = employees.filter((emp) => {
+    const keyword = search.toLowerCase();
+    const matchesSearch =
+      emp.name.toLowerCase().includes(keyword) ||
+      emp.code.toLowerCase().includes(keyword) ||
+      emp.email.toLowerCase().includes(keyword);
+
+    if (!matchesSearch) return false;
     if (tabValue === 1) return emp.status === 'Đang làm việc';
     if (tabValue === 2) return emp.status === 'Nghỉ phép';
     return true;
@@ -137,54 +128,76 @@ const Person = () => {
     <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: '#f4f6f9' }}>
       
       {/* ================= 1. TASKBAR BÊN TRÁI (SIDEBAR) ================= */}
-      <Box sx={{ width: 260, bgcolor: '#171654', color: '#fff', display: 'flex', flexDirection: 'column', p: 2 }}>
-        
-        {/* Khối Logo LibZone */}
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 4 }}>
-          <MenuBook sx={{ fontSize: 46, color: '#facc15' }} />
-          <Typography sx={{ fontSize: 40, fontWeight: 'bold' }}>LibZone</Typography>
-        </Box>
+      <Drawer
+        variant="permanent"
+        sx={{
+          width: 280,
+          flexShrink: 0,
+          '& .MuiDrawer-paper': {
+            width: 280,
+            bgcolor: '#171654',
+            color: 'white',
+            p: 2,
+            boxSizing: 'border-box',
+          },
+        }}
+      >
+        <Box>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 4 }}>
+            <MdMenuBook size={46} color="#facc15" />
+            <Typography sx={{ fontSize: 40, fontWeight: 'bold' }}>LibZone</Typography>
+          </Box>
 
-        {/* Danh sách các nút Menu chính */}
-        <List sx={{ flexGrow: 1 }}>
-          {[
-            { text: 'Tổng quan', icon: <FaBook />, path: '/home' },
-            { text: 'Quản lý sách', icon: <FaBook />, path: '/book' },
-            { text: 'Quản lý độc giả', icon: <FaUsers />, path: '/reader' },
-            { text: 'Quản lý nhân sự', icon: <FaUserTie size={18} />, path: '/person', active: true },
-            { text: 'Mượn / Trả sách', icon: <FaExchangeAlt />, path: '/borrow' },
-          ].map((item) => (
-            <ListItem key={item.text} disablePadding>
-              <ListItemButton 
-                component={Link} 
-                to={item.path}
-                sx={{
-                  borderRadius: 2,
-                  mb: 1,
-                  bgcolor: item.active ? 'rgba(255, 255, 255, 0.15)' : 'transparent',
-                  '&:hover': { bgcolor: 'rgba(255, 255, 255, 0.08)' }
-                }}
-              >
-                <ListItemIcon sx={{ color: '#fff', minWidth: 40 }}>{item.icon}</ListItemIcon>
-                <ListItemText primary={item.text} primaryTypographyProps={{ fontWeight: 'bold' }} />
+          <List>
+            <ListItem disablePadding>
+              <ListItemButton component={Link} to="/home" sx={{ borderRadius: 2, mb: 1, py: 1.1, '&:hover': { bgcolor: 'rgba(255,255,255,0.08)' } }}>
+                <ListItemIcon sx={{ color: 'white', minWidth: 40 }}><FaBook /></ListItemIcon>
+                <ListItemText primary="Tổng quan" primaryTypographyProps={{ fontWeight: 'bold' }} />
               </ListItemButton>
             </ListItem>
-          ))}
-        </List>
 
-        {/* Nút Cài đặt neo cố định ở góc cuối */}
+            <ListItem disablePadding>
+              <ListItemButton component={Link} to="/book" sx={{ borderRadius: 2, mb: 1, py: 1.1, '&:hover': { bgcolor: 'rgba(255,255,255,0.08)' } }}>
+                <ListItemIcon sx={{ color: 'white', minWidth: 40 }}><FaBook /></ListItemIcon>
+                <ListItemText primary="Quản lý sách" primaryTypographyProps={{ fontWeight: 'bold' }} />
+              </ListItemButton>
+            </ListItem>
+
+            <ListItem disablePadding>
+              <ListItemButton component={Link} to="/reader" sx={{ borderRadius: 2, mb: 1, py: 1.1, '&:hover': { bgcolor: 'rgba(255,255,255,0.08)' } }}>
+                <ListItemIcon sx={{ color: 'white', minWidth: 40 }}><FaUsers /></ListItemIcon>
+                <ListItemText primary="Quản lý độc giả" primaryTypographyProps={{ fontWeight: 'bold' }} />
+              </ListItemButton>
+            </ListItem>
+
+            <ListItem disablePadding>
+              <ListItemButton component={Link} to="/borrow" sx={{ borderRadius: 2, mb: 1, py: 1.1, '&:hover': { bgcolor: 'rgba(255,255,255,0.08)' } }}>
+                <ListItemIcon sx={{ color: 'white', minWidth: 40 }}><FaExchangeAlt /></ListItemIcon>
+                <ListItemText primary="Mượn / Trả sách" primaryTypographyProps={{ fontWeight: 'bold' }} />
+              </ListItemButton>
+            </ListItem>
+
+            <ListItem disablePadding>
+              <ListItemButton component={Link} to="/person" sx={{ borderRadius: 2, mb: 1, py: 1.1, bgcolor: 'rgba(255,255,255,0.15)', '&:hover': { bgcolor: 'rgba(255,255,255,0.18)' } }}>
+                <ListItemIcon sx={{ color: 'white', minWidth: 40 }}><FaUser /></ListItemIcon>
+                <ListItemText primary="Quản lý nhân sự" primaryTypographyProps={{ fontWeight: 'bold' }} />
+              </ListItemButton>
+            </ListItem>
+          </List>
+        </Box>
+
         <Box sx={{ mt: 'auto' }}>
           <Divider sx={{ bgcolor: 'rgba(255,255,255,0.2)', mb: 2 }} />
           <List>
             <ListItem disablePadding>
-              <ListItemButton component={Link} to="/settings" sx={{ borderRadius: 2 }}>
-                <ListItemIcon sx={{ color: '#fff', minWidth: 40 }}><FaCog /></ListItemIcon>
+              <ListItemButton component={Link} to="/settings" sx={{ borderRadius: 2, py: 1.1, '&:hover': { bgcolor: 'rgba(255,255,255,0.08)' } }}>
+                <ListItemIcon sx={{ color: 'white', minWidth: 40 }}><FaCog /></ListItemIcon>
                 <ListItemText primary="Cài đặt" primaryTypographyProps={{ fontWeight: 'bold' }} />
               </ListItemButton>
             </ListItem>
           </List>
         </Box>
-      </Box>
+      </Drawer>
 
       {/* ================= 2. KHỐI NỘI DUNG CHÍNH BÊN PHẢI ================= */}
       <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
@@ -234,9 +247,11 @@ const Person = () => {
           {/* Thanh Tabs phân loại dữ liệu và danh sách nhân viên */}
           <Paper elevation={0} sx={{ p: 3, borderRadius: 3, border: '1px solid #e0e0e0' }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, borderBottom: '1px solid #f0f0f0', pb: 1 }}>
-              <TextField 
-                size="small" 
-                placeholder="Tìm theo tên, mã, email..." 
+              <TextField
+                size="small"
+                placeholder="Tìm theo tên, mã, email..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
                 InputProps={{ startAdornment: <InputAdornment position="start"><Search fontSize="small" /></InputAdornment> }}
                 sx={{ width: 300 }}
               />
